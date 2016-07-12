@@ -37,6 +37,8 @@ public class latencyRead {
 
             String windows_key = jedis.hget(campaign, "windows");
             Long window_count = jedis.llen(windows_key);
+            // It should start from 1, as we are dropping the data from 0th place.
+            // Reason: Window is half complete and the latency calcuation will show negative numbers if the window is not closed.
             List<String> windows = jedis.lrange(windows_key, 1, window_count);
 
             for (String window_time : windows) {
