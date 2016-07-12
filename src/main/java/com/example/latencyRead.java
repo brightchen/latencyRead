@@ -1,14 +1,11 @@
 package com.example;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import redis.clients.jedis.Jedis;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -18,51 +15,29 @@ import java.util.Set;
  */
 public class latencyRead {
 
+    private static Integer WINDOW_WIDTH = 10000;
+
     public static void main(String[] args) throws IOException {
 
-        if ( args.length != 3 ) {
-            System.out.println("Usage: either one of the below ");
-            System.out.println("read redis outputfile");
-            System.out.println("reset redis mappingFile");
-            return ;
-        }
-
-       if ( args[0] == "read" ) {
-            calculate( new Jedis(args[1]), args[2] );
-       }
-        else {
-           reset( args[1], args[2] );
-       }
+       calculate(new Jedis(args[0]));
     }
 
-    private static void reset(String jedis, String fileLocation) throws IOException {
-
-        RedisHelper redisHelper = new RedisHelper();
-        redisHelper.init(jedis);
-        redisHelper.clear();
-        redisHelper.fillDB(fileLocation);
-
-        System.out.println("Success: Redis reset done.");
-    }
-
-    private static void calculate(Jedis jedis, String fileName) throws IOException {
+    private static void calculate(Jedis jedis) throws IOException {
 
         Set<String> campaigns = jedis.smembers("campaigns");
 
-        Path filePath = new Path(fileName);
+   //     System.out.println(campaigns);
 
-        Configuration configuration = new Configuration();
-        FileSystem fs;
-        fs = FileSystem.newInstance(filePath.toUri(), configuration);
+      //  System.out.println("-------------------------------");
+      //  System.out.println("campaign window_time seen latency");
 
-        FSDataOutputStream outputStream = fs.create(filePath, true);
-        BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+        List<Long> latencies = new ArrayList<Long>();
 
         for (String campaign : campaigns) {
 
             String windows_key = jedis.hget(campaign, "windows");
             Long window_count = jedis.llen(windows_key);
-            List<String> windows = jedis.lrange(windows_key, 0, window_count);
+            List<String> windows = jedis.lrange(windows_key, 1, window_count);
 
             for (String window_time : windows) {
 
@@ -71,15 +46,19 @@ public class latencyRead {
                 String time_updated = jedis.hget(window_key, "time_updated");
                 Long latency = Long.parseLong(time_updated) - Long.parseLong(window_time);
 
-                String output = seen + " " + latency.toString() + "\n";
+                latency = latency - WINDOW_WIDTH;
 
-                System.out.println(output);
-                bufferedWriter.write(output);
+                latencies.add(latency);
+                // System.out.println(campaign + " " + window_key + " " + window_time + " " + seen + " " + latency.toString());
+                 // latencies.add(latency);
             }
         }
+       // Collections.sort(latencies);
 
-        bufferedWriter.close();
+        for ( long latency: latencies) {
+            System.out.println(latency);
+        }
 
-        System.out.println("Success: latency calculation done.");
+     //   System.out.println("Success: latency calculation done.");
     }
 }
