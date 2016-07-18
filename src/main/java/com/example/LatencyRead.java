@@ -69,6 +69,8 @@ public class LatencyRead
       int latencyIndex = (int)latency/100;
       if(latencyIndex > 19) {
         latencyIndex = 19;
+      } else if(latencyIndex < 0) {
+        latencyIndex = 0;
       }
       counts[latencyIndex]++;
     }
