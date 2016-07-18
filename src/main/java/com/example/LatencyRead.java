@@ -76,9 +76,11 @@ public class LatencyRead
     int accumulateCount = 0;
     System.out.println("latency group by 100 milli second");
     for(int index = 0; index < counts.length; ++index) {
-      System.out.println("seperate: " + index + ": " + counts[index] + "; percentage: " + counts[index]/latencies.size());
+      System.out.println("index: " + index + "; range: " + 100 * index + " - " + (index+1 == counts.length ? "" :100 * (index+1)));
+      System.out.println("seperate:   " + counts[index] + "; percentage: " + counts[index]*100/latencies.size());
       accumulateCount += counts[index];
-      System.out.println("acculation: " + index + ": " + accumulateCount + "; percentage: " + accumulateCount/latencies.size());
+      System.out.println("acculation: " + accumulateCount + "; percentage: " + accumulateCount*100/latencies.size());
+      System.out.println();
     }
     
     System.out.println("total count: " + totalCount);
