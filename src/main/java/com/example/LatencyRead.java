@@ -60,15 +60,15 @@ public class LatencyRead
     }
     
     
-    int[] counts = new int[10];
+    int[] counts = new int[20];
     System.out.println("sorted latencies:");
     Collections.sort(latencies);
     for (long latency : latencies) {
       System.out.println(latency);
       
       int latencyIndex = (int)latency/100;
-      if(latencyIndex > 9) {
-        latencyIndex = 9;
+      if(latencyIndex > 19) {
+        latencyIndex = 19;
       }
       counts[latencyIndex]++;
     }
