@@ -58,20 +58,31 @@ public class LatencyRead
       }
       totalWindow = Math.max(totalWindow, windows.size());
     }
-    System.out.println("not sorted latencies:");
-    Collections.sort(latencies);
-    for (long latency : latencies) {
-      System.out.println(latency);
-    }
-
+    
+    
+    int[] counts = new int[10];
     System.out.println("sorted latencies:");
     Collections.sort(latencies);
     for (long latency : latencies) {
       System.out.println(latency);
+      
+      int latencyIndex = (int)latency/100;
+      if(latencyIndex > 9) {
+        latencyIndex = 9;
+      }
+      counts[latencyIndex]++;
     }
 
+    int accumulateCount = 0;
+    System.out.println("latency group by 100 milli second");
+    for(int index = 0; index < counts.length; ++index) {
+      System.out.println("seperate: " + index + ": " + counts[index] + "; percentage: " + counts[index]/latencies.size());
+      accumulateCount += counts[index];
+      System.out.println("acculation: " + index + ": " + accumulateCount + "; percentage: " + accumulateCount/latencies.size());
+    }
+    
     System.out.println("total count: " + totalCount);
     System.out.println("total windows: " + totalWindow);
-    System.out.println("throughput : " + totalCount/totalWindow/WINDOW_WIDTH);
+    System.out.println("throughput/second : " + totalCount/(--totalWindow)/(WINDOW_WIDTH/1000));
   }
 }
