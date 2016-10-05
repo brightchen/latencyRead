@@ -58,8 +58,37 @@ public class LatencyRead
       }
       totalWindow = Math.max(totalWindow, windows.size());
     }
+ 
+    outputGroupByCount(latencies);
+    System.out.println();
+    outputThroughput(totalCount, totalWindow);
+  }
+  
+  /**
+   * Each group have same count
+   * @param latencies
+   * @param counts
+   * @param totalCount
+   * @param totalWindow
+   */
+  protected static void outputGroupByCount(List<Long> latencies)
+  {
+    final int groups = 10;
+    System.out.println("latency group by count");
+    Collections.sort(latencies);
+    int totalCount = latencies.size();
+    int step = totalCount / groups;
+    int i=0;
+    for(; i<groups-1; ++i) {
+      System.out.println("" + i * 100/groups + " - " + (i+1) *100/groups + ": " + latencies.get(step * (i+1)));
+    }
+    //last one
+    System.out.println("" + i * 100/groups + " - 100: " + latencies.get(latencies.size()));
     
-    
+  }
+  
+  protected static void outputGroupByTime(List<Long> latencies, int totalCount, int totalWindow)
+  {
     int[] counts = new int[20];
     System.out.println("sorted latencies:");
     Collections.sort(latencies);
@@ -74,7 +103,7 @@ public class LatencyRead
       }
       counts[latencyIndex]++;
     }
-
+    
     int accumulateCount = 0;
     System.out.println("latency group by 100 milli second");
     for(int index = 0; index < counts.length; ++index) {
@@ -84,7 +113,10 @@ public class LatencyRead
       System.out.println("acculation: " + accumulateCount + "; percentage: " + accumulateCount*100/latencies.size());
       System.out.println();
     }
-    
+  }
+  
+  protected static void outputThroughput(long totalCount, int totalWindow)
+  {
     System.out.println("total count: " + totalCount);
     System.out.println("total windows: " + totalWindow);
     System.out.println("throughput/second : " + totalCount/(--totalWindow)/(WINDOW_WIDTH/1000));
