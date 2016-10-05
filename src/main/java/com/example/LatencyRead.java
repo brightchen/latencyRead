@@ -59,23 +59,30 @@ public class LatencyRead
       totalWindow = Math.max(totalWindow, windows.size());
     }
  
+    Collections.sort(latencies);
+    
+    outputLatencyDetail(latencies);
+    System.out.println();
     outputGroupByCount(latencies);
     System.out.println();
     outputThroughput(totalCount, totalWindow);
   }
-  
+
+  protected static void outputLatencyDetail(List<Long> latencies)
+  {
+    for (long latency : latencies) {
+      System.out.println(latency);
+    }
+  }
   /**
    * Each group have same count
    * @param latencies
-   * @param counts
-   * @param totalCount
-   * @param totalWindow
    */
   protected static void outputGroupByCount(List<Long> latencies)
   {
     final int groups = 10;
     System.out.println("latency group by count");
-    Collections.sort(latencies);
+
     int totalCount = latencies.size();
     int step = totalCount / groups;
     int i=0;
@@ -83,7 +90,7 @@ public class LatencyRead
       System.out.println("" + i * 100/groups + " - " + (i+1) *100/groups + ": " + latencies.get(step * (i+1)));
     }
     //last one
-    System.out.println("" + i * 100/groups + " - 100: " + latencies.get(latencies.size()));
+    System.out.println("" + i * 100/groups + " - 100: " + latencies.get(latencies.size() - 1));
     
   }
   
@@ -91,10 +98,7 @@ public class LatencyRead
   {
     int[] counts = new int[20];
     System.out.println("sorted latencies:");
-    Collections.sort(latencies);
     for (long latency : latencies) {
-      System.out.println(latency);
-      
       int latencyIndex = (int)latency/100;
       if(latencyIndex > 19) {
         latencyIndex = 19;
