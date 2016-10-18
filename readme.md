@@ -1,0 +1,1 @@
+a java tool to query the dimension result via web socket
