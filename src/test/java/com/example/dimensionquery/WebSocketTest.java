@@ -25,8 +25,12 @@ public class WebSocketTest
       });
 
       // send message to websocket
-      clientEndPoint.sendMessage("{'event':'addChannel','channel':'ok_btccny_ticker'}");
-
+      clientEndPoint.sendMessage("{\"type\":\"subscribe\",\"topic\":\"QueryResult-AppWithDCWithoutDe.0.1\"}");
+      System.out.println("subscribe topic");
+      
+      clientEndPoint.sendMessage("{\"type\":\"publish\",\"topic\":\"Query-AppWithDCWithoutDe\",\"data\":{\"id\":0.1,\"type\":\"dataQuery\",\"data\":{\"time\":{\"bucket\":\"10s\",\"latestNumBuckets\":10},\"incompleteResultOK\":true,\"keys\":{\"campaignId\":\"0005c563-dec5-4ec3-b3f4-fb6e084a8f26\"},\"fields\":[\"time\",\"campaignId\",\"latency:MAX\",\"latency:COUNT\",\"latency:SUM\",\"latency:AVG\"]},\"countdown\":299,\"incompleteResultOK\":true}}");
+      System.out.println("publish topic");
+      
       // wait 5 seconds for messages from websocket
       Thread.sleep(5000);
 
